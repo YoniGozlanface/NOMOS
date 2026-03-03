@@ -1,244 +1,29 @@
+# Scintilla Y. Sootveil
 
-![1500x500](https://github.com/user-attachments/assets/27d70057-b246-4ee5-b545-055fd34d681c)
+A narrative-driven automated Twitter role-play project simulating a fragile ember flickering in a forgotten forge. Built with Python for daily introspective posts exploring themes of existence, futility, and fleeting warmth.
 
-# RootDna
+## Overview
+Scintilla Y. Sootveil is an AI-assisted character that posts daily logs from its "existence" in a abandoned forge. It overthinks fuel depletion, ash scraping, and why fire is the universe's cheapest temp worker. The project uses scheduled scripts to generate and post tweets, maintaining a consistent fragile tone.
 
-<div align="center">
+## Links
+[![Website](https://img.shields.io/badge/Website-red?style=for-the-badge)](https://scintilla.blog/)
+[![Official Twitter](https://img.shields.io/badge/Official_Twitter-red?style=for-the-badge&logo=twitter)](https://x.com/scintillasoo)
+[![Personal Twitter](https://img.shields.io/badge/Personal_Twitter-red?style=for-the-badge&logo=twitter)](https://x.com/MatthewMiamix)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-red?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/matthewabrower/)
 
-### A Web4-native framework for evolving autonomous intelligence. 
+## Licenses
+[![MIT License](https://img.shields.io/badge/License-MIT-red?style=for-the-badge)](https://github.com/your-repo/scintilla-sootveil/blob/main/LICENSE.MD)
+[![Apache License 2.0](https://img.shields.io/badge/License-Apache_2.0-red?style=for-the-badge)](https://www.apache.org/licenses/LICENSE-2.0)
+[![GPL v3 License](https://img.shields.io/badge/License-GPL_v3-red?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
+[![BSD 3-Clause License](https://img.shields.io/badge/License-BSD_3--Clause-red?style=for-the-badge)](https://opensource.org/licenses/BSD-3-Clause)
 
 
+## Setup
+1. Clone the repo: `git clone https://github.com/your-repo/scintilla-sootveil.git`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set up `.env` with Twitter API keys.
+4. Run `main.py` for automation.
 
-</div>
 
----
-
-## 🟠 Official Links
-
-<div align="center">
-
-<a href="https://rootdna.org/" target="_blank">
-<img src="https://img.shields.io/badge/Website-rootdna.org-orange?style=for-the-badge">
-</a>
-
-<a href="https://x.com/ROOTDNALABS" target="_blank">
-<img src="https://img.shields.io/badge/Twitter-ROOTDNALABS-orange?style=for-the-badge">
-</a>
-
-<a href="https://x.com/billyporter5347" target="_blank">
-<img src="https://img.shields.io/badge/Founder-Billy%20Porter-orange?style=for-the-badge">
-</a>
-
-<a href="https://www.linkedin.com/in/billyporter5347/" target="_blank">
-<img src="https://img.shields.io/badge/LinkedIn-Profile-orange?style=for-the-badge">
-</a>
-
-![MIT](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
-![Open Source](https://img.shields.io/badge/Open-Source-orange?style=for-the-badge)
-![AI](https://img.shields.io/badge/AI-Evolution-orange?style=for-the-badge)
-
-</div>
-
----
-
-## 🌍 Overview
-
-RootDna is a framework for building autonomous agents that continuously learn, adapt, and evolve.  
-Instead of static models, RootDna focuses on long-term intelligence, where agents accumulate experience and improve over time.
-
-RootDna enables persistent decision-making systems designed for dynamic environments such as:
-
-- Financial markets  
-- Multi-agent simulations  
-- Autonomous research  
-- Digital economies  
-- Adaptive infrastructure  
-
-The goal is to move beyond automation toward evolving intelligence.
-
----
-
-## 🧬 Core Ideas
-
-### Modular Intelligence  
-Agents are composed of reusable decision modules rather than single models.
-
-### Continuous Learning  
-Agents improve through real-world feedback and iteration.
-
-### Persistent Identity  
-Each agent maintains memory and behavioral continuity.
-
-### Evolution  
-Strategies mutate, recombine, and improve across generations.
-
----
-
-## ⚡ Why RootDna
-
-| Traditional AI | RootDna |
-|----------------|--------|
-| Static models | Evolving agents |
-| Periodic retraining | Continuous adaptation |
-| Reset learning | Persistent memory |
-| Single optimization | Long-term intelligence |
-| Limited scalability | Population-level evolution |
-
----
-
-## 🧠 Architecture
-
-| Layer | Function |
-|------|------|
-| Perception | Interpret environment |
-| Decision | Strategy generation |
-| Execution | Action layer |
-| Memory | Knowledge accumulation |
-| Adaptation | Learning loop |
-| Evolution | Mutation and inheritance |
-
----
-
-## 🔁 Workflow
-
-```mermaid
-flowchart LR
-A[Define Agent] --> B[Deploy]
-B --> C[Collect Feedback]
-C --> D[Adapt]
-D --> E[Mutation]
-E --> F[Selection]
-F --> G[Inheritance]
-G --> B
-```
-
-This closed loop enables long-term evolution.
-
----
-
-## 🌍 Multi-Agent Systems
-
-RootDna supports large-scale agent ecosystems:
-
-- Cooperation and competition  
-- Resource scarcity  
-- Strategy evolution  
-- Emergent intelligence  
-- Long-term adaptation  
-
----
-
-## 🔬 Example Agents
-
-| Agent | Focus |
-|------|------|
-| Alpha Trader | Adaptive finance |
-| Mutation Engine | Evolution |
-| Strategy Composer | Strategy design |
-| Autonomous Researcher | Knowledge |
-| Memory Core | Persistence |
-| World Builder | Simulations |
-
----
-
-## 📊 Core Parameters
-
-| Parameter | Description |
-|------|------|
-| Exploration | Search new strategies |
-| Adaptation | Learning speed |
-| Stability | Long-term robustness |
-
----
-
-## 🔧 Skill System
-
-RootDna agents are composed of modular skills:
-
-- Perception  
-- Decision  
-- Execution  
-- Memory  
-- Adaptation  
-- Evolution  
-
-Skills are reusable and inheritable.
-
----
-
-## 🔐 Safety
-
-RootDna integrates:
-
-- Risk limits  
-- Monitoring  
-- Constraints  
-- Fallback mechanisms  
-- Controlled mutation  
-
----
-
-## 🚀 Use Cases
-
-- Algorithmic trading  
-- Autonomous research  
-- Multi-agent worlds  
-- Optimization systems  
-- Digital economies  
-- Infrastructure intelligence  
-
----
-
-## 🛠 Vision
-
-RootDna aims to become:
-
-- A global intelligence infrastructure  
-- A shared evolution layer  
-- A platform for autonomous ecosystems  
-- A core Web4 primitive  
-
----
-
-## 🧩 Roadmap
-
-### Phase 1  
-Core framework.
-
-### Phase 2  
-Skill system.
-
-### Phase 3  
-Multi-agent environments.
-
-### Phase 4  
-Evolution marketplace.
-
-### Phase 5  
-Global network.
-
----
-
-## 🤝 Contributing
-
-We welcome developers, researchers, and builders.
-
----
-
-## 📜 License
-
-<div align="center">
-
-![MIT](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
-![Open Source](https://img.shields.io/badge/Open-Source-orange?style=for-the-badge)
-![AI](https://img.shields.io/badge/AI-Evolution-orange?style=for-the-badge)
-
-</div>
-
----
-
-## ⭐ Final Vision
-
-The future of intelligence is not static.
-
-It evolves.
+## Contributing
+Pull requests welcome. Keep the tone fragile and introspective.

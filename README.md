@@ -11,6 +11,7 @@
 
 # NOMOS
 
+##https://pump.fun/coin/HCnA7RXjzVnJLKQqsEqZgdXtsSBLUrR2sJxQA5pTpump
 
 <p align="center">
   <strong>Reputation infrastructure for the Web4 AI economy</strong><br>

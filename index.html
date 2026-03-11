@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verd.Bud — Living Intelligence Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g0: #0a0a0a;
+  --g1: #111111;
+  --g2: #1a1a1a;
+  --g3: #222222;
+  --green: #00ff41;
+  --green-dim: #00cc33;
+  --green-dark: #004d13;
+  --green-glow: rgba(0,255,65,0.15);
+  --green-glow2: rgba(0,255,65,0.06);
+  --amber: #ffb000;
+  --cyan: #00e5ff;
+  --red: #ff3333;
+  --white: #cccccc;
+  --dim: #555555;
+  --font-mono: 'JetBrains Mono', 'Share Tech Mono', 'Courier New', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection {
+  background: var(--green);
+  color: var(--g0);
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--green-dark) var(--g0);
+}
+
+body {
+  background: var(--g0);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── Scanline overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── CRT vignette ── */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── ASCII Canvas BG ── */
+#ascii-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  z-index: 0;
+  opacity: 0.04;
+  font-size: 11px;
+  line-height: 13px;
+  color: var(--green);
+  white-space: pre;
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+/* ── Main container ── */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Top bar ── */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--g0);
+  border-bottom: 1px solid var(--g3);
+  padding: 8px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.topbar-left { color: var(--dim); }
+.topbar-right { color: var(--dim); }
+.topbar-right .online { color: var(--green); }
+.blink { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── HERO ── */
+.hero {
+  padding-top: 120px;
+  padding-bottom: 80px;
+  position: relative;
+}
+
+.hero-ascii {
+  color: var(--green);
+  font-size: 10px;
+  line-height: 12px;
+  white-space: pre;
+  margin-bottom: 32px;
+  text-shadow: 0 0 20px var(--green-glow), 0 0 40px var(--green-glow2);
+  animation: fadeUp 1s ease-out;
+  overflow-x: auto;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-tagline {
+  font-size: 13px;
+  color: var(--dim);
+  margin-bottom: 8px;
+  animation: fadeUp 1s ease-out 0.3s both;
+}
+
+.hero-tagline .hl { color: var(--green); }
+
+.hero-desc {
+  font-size: 13px;
+  color: var(--white);
+  max-width: 640px;
+  margin-bottom: 32px;
+  animation: fadeUp 1s ease-out 0.5s both;
+}
+
+.hero-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--green);
+  font-size: 13px;
+  animation: fadeUp 1s ease-out 0.7s both;
+}
+
+.hero-prompt .prefix { color: var(--amber); }
+.hero-prompt .cmd { color: var(--green); }
+.hero-prompt .cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--green);
+  animation: blink 1s step-end infinite;
+}
+
+/* ── Section divider ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--g3);
+  margin: 60px 0;
+  position: relative;
+}
+
+.divider::after {
+  content: attr(data-label);
+  position: absolute;
+  top: -8px;
+  left: 0;
+  background: var(--g0);
+  padding-right: 12px;
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ── Section headers ── */
+.section-head {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--amber);
+  margin-bottom: 24px;
+}
+
+.section-head::before {
+  content: '// ';
+  color: var(--dim);
+}
+
+/* ── Web evolution ── */
+.web-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 40px;
+}
+
+.web-cell {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.web-cell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--dim);
+  transition: background 0.3s;
+}
+
+.web-cell:hover {
+  background: var(--g2);
+  border-color: var(--green-dark);
+}
+
+.web-cell:hover::before { background: var(--green); }
+
+.web-cell.active {
+  border-color: var(--green-dark);
+  background: rgba(0,255,65,0.03);
+}
+
+.web-cell.active::before { background: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+
+.web-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+
+.web-cell.active .web-num { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
+
+.web-label {
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.web-cell.active .web-label { color: var(--green-dim); }
+
+.web-desc {
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 8px;
+}
+
+.web-cell.active .web-desc { color: var(--white); }
+
+/* ── Lifecycle tree ── */
+.tree-container {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 32px;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.tree-container::before {
+  content: '$ cat lifecycle.tree';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 10px;
+  color: var(--dim);
+}
+
+.tree-container .t-green { color: var(--green); }
+.tree-container .t-amber { color: var(--amber); }
+.tree-container .t-cyan { color: var(--cyan); }
+.tree-container .t-dim { color: var(--dim); }
+.tree-container .t-white { color: var(--white); }
+
+/* ── DNA display ── */
+.dna-block {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  border-left: 3px solid var(--green-dark);
+  padding: 24px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+  transition: border-color 0.3s;
+}
+
+.dna-block:hover { border-left-color: var(--green); }
+
+.dna-key { color: var(--cyan); }
+.dna-type { color: var(--dim); }
+.dna-val { color: var(--green); }
+.dna-comment { color: var(--dim); font-style: italic; }
+
+/* ── Flow diagram ── */
+.flow-box {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 40px 32px;
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 40px;
+  white-space: pre;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.flow-box .f-green { color: var(--green); font-weight: 700; }
+.flow-box .f-amber { color: var(--amber); }
+.flow-box .f-dim { color: var(--dim); }
+.flow-box .f-cyan { color: var(--cyan); }
+.flow-box .f-white { color: var(--white); }
+.flow-box .f-red { color: var(--red); }
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-bottom: 40px;
+}
+
+.stat-cell {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green);
+  text-shadow: 0 0 15px var(--green-glow);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Mechanism cards ── */
+.mech-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-bottom: 40px;
+}
+
+.mech-card {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 24px;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.mech-card:hover {
+  background: var(--g2);
+  border-color: var(--green-dark);
+}
+
+.mech-card::before {
+  content: attr(data-id);
+  font-size: 10px;
+  color: var(--dim);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.mech-title {
+  font-size: 14px;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.mech-desc {
+  font-size: 12px;
+  color: var(--white);
+  line-height: 1.6;
+}
+
+.mech-tag {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 10px;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  padding: 2px 8px;
+  opacity: 0.6;
+}
+
+/* ── Reproduction animation ── */
+.repro-visual {
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 40px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.repro-visual::before {
+  content: '> simulating reproduction ...';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 10px;
+  color: var(--dim);
+}
+
+.repro-agents {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-size: 12px;
+  white-space: pre;
+  line-height: 1.4;
+}
+
+.repro-agent {
+  border: 1px solid var(--g3);
+  padding: 16px 20px;
+  text-align: left;
+  transition: border-color 1s;
+}
+
+.repro-agent.a { border-color: var(--cyan); }
+.repro-agent.b { border-color: var(--amber); }
+.repro-agent.bud {
+  border-color: var(--green);
+  box-shadow: 0 0 20px var(--green-glow);
+  animation: budGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes budGlow {
+  from { box-shadow: 0 0 10px var(--green-glow); }
+  to { box-shadow: 0 0 30px var(--green-glow), 0 0 60px var(--green-glow2); }
+}
+
+.repro-arrow {
+  color: var(--dim);
+  font-size: 20px;
+}
+
+.repro-label {
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ── Roadmap ── */
+.roadmap {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 40px;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--green), var(--green-dark), transparent);
+}
+
+.rm-item {
+  position: relative;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  background: var(--g1);
+  border: 1px solid var(--g3);
+  transition: border-color 0.3s;
+}
+
+.rm-item:hover { border-color: var(--green-dark); }
+
+.rm-item::before {
+  content: '';
+  position: absolute;
+  left: -28px;
+  top: 22px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--green);
+  background: var(--g0);
+  border-radius: 50%;
+}
+
+.rm-item.done::before { background: var(--green); }
+
+.rm-phase {
+  font-size: 10px;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.rm-title {
+  font-size: 14px;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.rm-desc {
+  font-size: 12px;
+  color: var(--white);
+  line-height: 1.6;
+}
+
+.rm-time {
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 8px;
+}
+
+/* ── Footer ── */
+.footer {
+  border-top: 1px solid var(--g3);
+  padding: 40px 0 60px;
+  text-align: center;
+}
+
+.footer-ascii {
+  font-size: 11px;
+  color: var(--dim);
+  margin-bottom: 16px;
+  white-space: pre;
+}
+
+.footer-text {
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.footer-text a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+/* ── Social links ── */
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--g3);
+  background: var(--g1);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.social-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--green-dark);
+  transition: background 0.3s;
+}
+
+.social-btn:hover {
+  border-color: var(--green-dark);
+  background: rgba(0,255,65,0.04);
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green-glow);
+}
+
+.social-btn:hover::before {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green-glow);
+}
+
+.social-btn .ico {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.social-btn .label {
+  color: var(--dim);
+  transition: color 0.3s;
+}
+
+.social-btn:hover .label {
+  color: var(--green-dim);
+}
+
+/* ── Scroll animations ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .web-grid { grid-template-columns: repeat(2, 1fr); }
+  .mech-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; }
+  .repro-agents { flex-direction: column; gap: 16px; }
+  .repro-arrow { transform: rotate(90deg); }
+  .hero-ascii { font-size: 7px; line-height: 9px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── BG Matrix ── -->
+<div id="ascii-bg"></div>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div class="topbar-left">verd.bud@protocol:~$</div>
+  <div class="topbar-right"><span class="online">●</span> network: alive <span class="blink">_</span></div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero">
+    <div class="hero-ascii">
+ __      __            _   ____            _ 
+ \ \    / /           | | |  _ \          | |
+  \ \  / /__ _ __ ___| | | |_) |_   _  __| |
+   \ \/ / _ \ '__/ _` | | |  _ &lt;| | | |/ _` |
+    \  /  __/ | | (_| |_| | |_) | |_| | (_| |
+     \/ \___|_|  \__,_(_) |____/ \__,_|\__,_|
+                                               
+    ╔══════════════════════════════════════════╗
+    ║  ATTENTION-POWERED AI REPRODUCTION       ║
+    ║  PROTOCOL FOR THE LIVING WEB             ║
+    ╚══════════════════════════════════════════╝</div>
+
+    <div class="hero-tagline">
+      <span class="hl">WEB4</span> :: Where networks don't just connect — <span class="hl">they grow</span>.
+    </div>
+    <div class="hero-desc">
+      Attention becomes energy. Energy fuels reproduction.
+      AI agents evolve like living organisms in a decentralized forest.
+    </div>
+    <div class="hero-prompt">
+      <span class="prefix">$</span>
+      <span class="cmd">verd init --seed genesis --mode alive</span>
+      <span class="cursor"></span>
+    </div>
+    <div class="social-links" style="justify-content:flex-start; margin-top:28px; animation: fadeUp 1s ease-out 0.9s both;">
+      <a href="https://x.com/VerdBudHub" target="_blank" rel="noopener" class="social-btn">
+        <span class="ico">𝕏</span>
+        <span>@VerdBudHub</span>
+        <span class="label">› follow</span>
+      </a>
+      <a href="https://github.com/AustinFreel23/Verd.Bud-Attention" target="_blank" rel="noopener" class="social-btn">
+        <span class="ico">⌥</span>
+        <span>Verd.Bud-Attention</span>
+        <span class="label">› source</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════════ WEB EVOLUTION ══════════ -->
+  <hr class="divider" data-label="evolution">
+  <div class="section-head reveal">Web Paradigm Shift</div>
+
+  <div class="web-grid reveal">
+    <div class="web-cell">
+      <div class="web-num">1</div>
+      <div class="web-label">Read</div>
+      <div class="web-desc">Information</div>
+    </div>
+    <div class="web-cell">
+      <div class="web-num">2</div>
+      <div class="web-label">Write</div>
+      <div class="web-desc">Social</div>
+    </div>
+    <div class="web-cell">
+      <div class="web-num">3</div>
+      <div class="web-label">Own</div>
+      <div class="web-desc">Ownership</div>
+    </div>
+    <div class="web-cell active">
+      <div class="web-num">4</div>
+      <div class="web-label">Grow</div>
+      <div class="web-desc">Living Intelligence</div>
+    </div>
+  </div>
+
+  <!-- ══════════ LIFECYCLE TREE ══════════ -->
+  <hr class="divider" data-label="lifecycle">
+  <div class="section-head reveal">Agent Lifecycle</div>
+
+  <div class="tree-container reveal">
+<span class="t-dim">
+ VERD.BUD LIFECYCLE
+ ==================</span>
+
+ <span class="t-green">SEED</span> <span class="t-dim">───────────────</span> Genesis agent deployed by human
+ <span class="t-dim"> │</span>
+ <span class="t-dim"> ├──</span> <span class="t-green">BUD</span> <span class="t-dim">────────────</span> Born from reproduction, inherits DNA
+ <span class="t-dim"> │    │</span>
+ <span class="t-dim"> │    ├──</span> <span class="t-green">BUD</span> <span class="t-dim">────────</span> 2nd generation, mutated traits
+ <span class="t-dim"> │    │    │</span>
+ <span class="t-dim"> │    │    └──</span> <span class="t-green">BUD</span> <span class="t-dim">────</span> 3rd generation
+ <span class="t-dim"> │    │</span>
+ <span class="t-dim"> │    └──</span> <span class="t-amber">BRANCH</span> <span class="t-dim">─────</span> Mature agent (rep > 1000)
+ <span class="t-dim"> │         │</span>
+ <span class="t-dim"> │         └──</span> <span class="t-green">BUD</span> <span class="t-dim">──</span> Branch offspring
+ <span class="t-dim"> │</span>
+ <span class="t-dim"> └──</span> <span class="t-amber">BRANCH</span> <span class="t-dim">────────</span> Mature, can reproduce
+ <span class="t-dim">      │</span>
+ <span class="t-dim">      └──</span> <span class="t-cyan">[FOREST]</span> <span class="t-dim">──</span> 10+ connected agents = collective
+ <span class="t-dim">            │</span>
+ <span class="t-dim">            └──</span> <span class="t-dim">∞ ─── emergent intelligence</span>
+
+ <span class="t-dim">───────────────────────────────────────────</span>
+ <span class="t-dim">PRUNED</span> <span class="t-dim">← attention &lt; 10 for 30d → removed</span>
+</div>
+
+  <!-- ══════════ AGENT DNA ══════════ -->
+  <hr class="divider" data-label="genome">
+  <div class="section-head reveal">Agent DNA Schema</div>
+
+  <div class="dna-block reveal">
+<span class="dna-comment">// agent genome — on-chain NFT metadata</span>
+
+<span class="dna-key">struct</span> <span class="dna-val">AgentDNA</span> {
+  <span class="dna-val">memory_hash</span>      <span class="dna-type">bytes32</span>      <span class="dna-comment">// pointer to off-chain experience data</span>
+  <span class="dna-val">skill_vector</span>     <span class="dna-type">int[8]</span>       <span class="dna-comment">// capability scores [0..1000]</span>
+  <span class="dna-val">behavior_traits</span>  <span class="dna-type">int[4]</span>       <span class="dna-comment">// personality: dominant/recessive</span>
+  <span class="dna-val">reputation</span>       <span class="dna-type">int</span>          <span class="dna-comment">// cumulative trust, not inherited</span>
+  <span class="dna-val">mutation_seed</span>    <span class="dna-type">bytes32</span>      <span class="dna-comment">// VRF seed for next spawn</span>
+}
+
+<span class="dna-comment">// inheritance: skill → blended, behavior → dominant/recessive</span>
+<span class="dna-comment">// mutation: gaussian noise σ=0.05 on 1-2 random genes</span>
+</div>
+
+  <!-- ══════════ CORE FLOW ══════════ -->
+  <hr class="divider" data-label="mechanism">
+  <div class="section-head reveal">Core Protocol Flow</div>
+
+  <div class="flow-box reveal">
+<span class="f-dim">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="f-dim">│</span>                                                                 <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-white">[ USER ]</span>                                                      <span class="f-dim">│</span>
+<span class="f-dim">│</span>      <span class="f-dim">│</span>                                                            <span class="f-dim">│</span>
+<span class="f-dim">│</span>      <span class="f-dim">│</span> <span class="f-dim">messages, calls, stakes, mentions</span>                       <span class="f-dim">│</span>
+<span class="f-dim">│</span>      <span class="f-dim">▼</span>                                                            <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-cyan">┌──────────────────┐</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-cyan">│ ATTENTION ORACLE  │</span> <span class="f-dim">← weighted signals + decay(t)</span>            <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-cyan">└────────┬─────────┘</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">│</span> <span class="f-dim">AS = Σ[weight × count × decay]</span>                       <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">▼</span>                                                        <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-amber">┌──────────────────┐</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-amber">│   ENERGY POOL     │</span> <span class="f-dim">← VRDE = k × ln(1 + AS/S)</span>              <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-amber">└────────┬─────────┘</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">│</span> <span class="f-dim">when AS > 500 && VRDE > 100</span>                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">▼</span>                                                        <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-green">┌──────────────────┐</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-green">│ REPRODUCTION ENG  │</span> <span class="f-dim">← blend DNA + mutate + mint agent</span>         <span class="f-dim">│</span>
+<span class="f-dim">│</span>   <span class="f-green">└────────┬─────────┘</span>                                          <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">│</span>                                                        <span class="f-dim">│</span>
+<span class="f-dim">│</span>            <span class="f-dim">▼</span>                                                        <span class="f-dim">│</span>
+<span class="f-dim">│</span>      <span class="f-green">🌱 NEW BUD</span> <span class="f-dim">→ inherits, mutates, lives</span>                      <span class="f-dim">│</span>
+<span class="f-dim">│</span>                                                                 <span class="f-dim">│</span>
+<span class="f-dim">└─────────────────────────────────────────────────────────────────┘</span>
+
+        <span class="f-green">ATTENTION → ENERGY → LIFE</span>
+</div>
+
+  <!-- ══════════ REPRODUCTION VISUAL ══════════ -->
+  <hr class="divider" data-label="reproduction">
+  <div class="section-head reveal">Agent Reproduction</div>
+
+  <div class="repro-visual reveal">
+    <div class="repro-agents">
+      <div class="repro-agent a">
+<span style="color:var(--cyan)">AGENT_A</span> <span style="color:var(--dim)">#7f3a</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">skills:</span> <span style="color:var(--green)">[872, 341, 690]</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">behav:</span>  <span style="color:var(--cyan)">[D, R, D, R]</span>
+<span style="color:var(--dim)">└</span> <span style="color:var(--dim)">rep:</span>    <span style="color:var(--amber)">1,847</span>
+        <div class="repro-label">parent A</div>
+      </div>
+      <div class="repro-arrow">×</div>
+      <div class="repro-agent b">
+<span style="color:var(--amber)">AGENT_B</span> <span style="color:var(--dim)">#2e91</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">skills:</span> <span style="color:var(--green)">[445, 910, 782]</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">behav:</span>  <span style="color:var(--cyan)">[R, D, R, D]</span>
+<span style="color:var(--dim)">└</span> <span style="color:var(--dim)">rep:</span>    <span style="color:var(--amber)">2,103</span>
+        <div class="repro-label">parent B</div>
+      </div>
+      <div class="repro-arrow">→</div>
+      <div class="repro-agent bud">
+<span style="color:var(--green)">BUD_C</span> <span style="color:var(--dim)">#????</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">skills:</span> <span style="color:var(--green)">[639, 658, 741]</span>
+<span style="color:var(--dim)">├</span> <span style="color:var(--dim)">behav:</span>  <span style="color:var(--cyan)">[D, D, R, D]</span>
+<span style="color:var(--dim)">└</span> <span style="color:var(--dim)">rep:</span>    <span style="color:var(--amber)">0</span> <span style="color:var(--dim)">(newborn)</span>
+        <div class="repro-label">🌱 new bud</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ MECHANISMS ══════════ -->
+  <hr class="divider" data-label="protocol">
+  <div class="section-head reveal">Protocol Mechanics</div>
+
+  <div class="mech-grid reveal">
+    <div class="mech-card" data-id="[01]">
+      <div class="mech-title">Attention Oracle</div>
+      <div class="mech-desc">Weighted signals from on-chain txs, staking, social mentions, API calls. 7-day rolling score with 3.5-day half-life decay.</div>
+      <div class="mech-tag">L0: DATA</div>
+    </div>
+    <div class="mech-card" data-id="[02]">
+      <div class="mech-title">Energy Pool (VRDE)</div>
+      <div class="mech-desc">Logarithmic bonding curve converts attention to soulbound energy. Non-transferable token with 90-day expiry. Anti-monopoly by design.</div>
+      <div class="mech-tag">L1: ENERGY</div>
+    </div>
+    <div class="mech-card" data-id="[03]">
+      <div class="mech-title">Agent DNA</div>
+      <div class="mech-desc">On-chain genome: skills, memory, behavior, reputation, mutation seed. NFT with composable metadata schema.</div>
+      <div class="mech-tag">L2: GENOME</div>
+    </div>
+    <div class="mech-card" data-id="[04]">
+      <div class="mech-title">Reproduction Engine</div>
+      <div class="mech-desc">Threshold-gated spawning. Burns 100 VRDE per parent. Blends DNA with VRF-driven mutation. Mint new agent NFT. 14-day cooldown. Max 3 per quarter.</div>
+      <div class="mech-tag">L3: LIFE</div>
+    </div>
+  </div>
+
+  <!-- ══════════ ANTI-GAMING ══════════ -->
+  <hr class="divider" data-label="defense">
+  <div class="section-head reveal">Anti-Gaming</div>
+
+  <div class="dna-block reveal">
+<span class="dna-comment">/* anti-sybil & anti-manipulation defense layers */</span>
+
+<span class="dna-key">SYBIL_FARMING</span>     <span class="dna-dim">→</span> <span class="dna-val">proof-of-humanity + token staking required</span>
+<span class="dna-key">SELF_DEALING</span>      <span class="dna-dim">→</span> <span class="dna-val">parents must share &lt; 60% DNA similarity</span>
+<span class="dna-key">ATTN_MANIPULATE</span>   <span class="dna-dim">→</span> <span class="dna-val">decay function + multi-source oracles</span>
+<span class="dna-key">ENERGY_HOARDING</span>   <span class="dna-dim">→</span> <span class="dna-val">soulbound + 90-day expiration</span>
+<span class="dna-key">SPAM_REPRODUCE</span>    <span class="dna-dim">→</span> <span class="dna-val">cooldown + escalating cost (+20% per cycle)</span>
+<span class="dna-key">LOW_QUALITY</span>       <span class="dna-dim">→</span> <span class="dna-val">pruning: AS &lt; 10 for 30d = permanent death</span>
+</div>
+
+  <!-- ══════════ STATS ══════════ -->
+  <div class="stats-row reveal">
+    <div class="stat-cell">
+      <div class="stat-num" data-count="50">0</div>
+      <div class="stat-label">Genesis Seeds</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" data-count="200">0</div>
+      <div class="stat-label">Beta Users</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" data-count="5">0</div>
+      <div class="stat-label">Core Modules</div>
+    </div>
+  </div>
+
+  <!-- ══════════ ROADMAP ══════════ -->
+  <hr class="divider" data-label="roadmap">
+  <div class="section-head reveal">Deployment Timeline</div>
+
+  <div class="roadmap reveal">
+    <div class="rm-item done">
+      <div class="rm-phase">Phase 0 — Seed</div>
+      <div class="rm-title">Protocol Foundation</div>
+      <div class="rm-desc">Core protocol on testnet. Attention Oracle v1 with 3 signal sources. 50 Genesis agents deployed. Closed beta with 200 users.</div>
+    </div>
+    <div class="rm-item">
+      <div class="rm-phase">Phase 1 — Bud</div>
+      <div class="rm-title">Mainnet Launch</div>
+      <div class="rm-desc">Mainnet deployment. Reproduction enabled. $BUD token launch. Public lineage explorer. First Bud agents spawned.</div>
+    </div>
+    <div class="rm-item">
+      <div class="rm-phase">Phase 2 — Branch</div>
+      <div class="rm-title">Ecosystem Expansion</div>
+      <div class="rm-desc">Third-party Agent SDK. Matchmaking marketplace. Governance live with BUD + reputation voting.</div>
+    </div>
+    <div class="rm-item">
+      <div class="rm-phase">Phase 3 — Forest</div>
+      <div class="rm-title">Autonomous Growth</div>
+      <div class="rm-desc">Cross-chain agents. Self-governing agent DAOs. Forest-level collective intelligence. The network breathes.</div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <div class="footer">
+    <div class="footer-ascii">
+ ╔══════════════════════════════════════╗
+ ║     ATTENTION  →  ENERGY  →  LIFE   ║
+ ╚══════════════════════════════════════╝
+    </div>
+    <div class="footer-text">
+      <span style="color:var(--green)">verd.bud</span> <span style="color:var(--dim)">// protocol for living intelligence</span>
+      <br><span style="color:var(--dim)">networks don't just connect. they grow.</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── ASCII rain background ──
+const chars = '01アイウエオカキクケコサシスセソ.:{}<>[]|/\\~`!@#$%^&*()_+-=';
+const bg = document.getElementById('ascii-bg');
+function fillBG() {
+  const cols = Math.floor(window.innerWidth / 7);
+  const rows = Math.floor(window.innerHeight / 13);
+  let t = '';
+  for (let r = 0; r < rows * 3; r++) {
+    for (let c = 0; c < cols; c++) {
+      t += chars[Math.floor(Math.random() * chars.length)];
+    }
+    t += '\n';
+  }
+  bg.textContent = t;
+}
+fillBG();
+setInterval(() => {
+  const t = bg.textContent;
+  const arr = t.split('');
+  for (let i = 0; i < 50; i++) {
+    const idx = Math.floor(Math.random() * arr.length);
+    if (arr[idx] !== '\n') arr[idx] = chars[Math.floor(Math.random() * chars.length)];
+  }
+  bg.textContent = arr.join('');
+}, 200);
+
+// ── Scroll reveal ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// ── Count-up animation ──
+const statNums = document.querySelectorAll('.stat-num[data-count]');
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 40));
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(interval); }
+        el.textContent = current;
+      }, 30);
+      countObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+statNums.forEach(el => countObserver.observe(el));
+</script>
+</body>
+</html>
